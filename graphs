@@ -142,3 +142,46 @@ class Solution {
         return true;
     }
 }
+________________________________________
+//detecting cycle in an indirected graph using bfs
+class Solution {
+    private boolean bfs(Queue<Integer> q, ArrayList<ArrayList<Integer>> adj, int vis[],boolean ans){
+        while(!q.isEmpty()){
+            int node=q.peek();
+            q.remove();
+            for(Integer n:adj.get(node)){
+                
+                if (q.contains(n) && vis[n]==1){
+                    ans=true;
+                    break;
+                }
+                else if(vis[n]==0){
+                    q.add(n);
+                    vis[n]=1;
+                }
+            }
+            if(ans){
+                break;
+            }
+        }
+        return ans;
+    }
+    // Function to detect cycle in an undirected graph.
+    public boolean isCycle(int V, ArrayList<ArrayList<Integer>> adj) {
+        // Code here
+        boolean ans=false;
+        Queue<Integer> q=new LinkedList<>();
+        int vis[]=new int[V];
+        for(int i=0;i<V;i++){
+            if(vis[i]==0){
+                vis[i]=1;
+                q.add(i);
+                ans=bfs(q,adj,vis,ans);
+                if(ans){
+                    return ans;
+                }
+            }
+        }
+        return ans;
+    }
+}
