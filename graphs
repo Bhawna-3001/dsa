@@ -350,3 +350,75 @@ class Solution
         return dis;
     }
 }
+time comp: ElogV
+________________________________________
+//bellman ford algo
+class Solution {
+    static int[] bellman_ford(int V, ArrayList<ArrayList<Integer>> edges, int S) {
+        // Write your code here
+        int dis[]=new int[V];
+        for (int i=0;i<V;i++){
+            dis[i]=(int)(1e8);
+        }
+        dis[S]=0;
+        for(int i=0;i<V;i++){
+            for(ArrayList<Integer> node: edges){
+                int from=node.get(0);
+                int to=node.get(1);
+                int wt=node.get(2);
+                if(dis[from]!=(int)(1e8) && dis[from]+wt<dis[to]){
+                    dis[to]=dis[from]+wt;
+                }
+            }
+        }
+        for(ArrayList<Integer> node:edges){
+            int from=node.get(0);
+            int to=node.get(1);
+            int wt=node.get(2);
+            if(dis[from]!=(int)(1e8) && dis[from]+wt<dis[to]){
+                dis[to]=dis[from]+wt;
+                int arr[]=new int[1];
+                arr[0]=-1;
+                return arr;
+            }
+        }
+        return dis;
+    }
+}
+time comp: E*V
+cannot be used with self loops
+__________________________________________
+//floyd warshall algo
+class Solution
+{
+    public void shortest_distance(int[][] matrix)
+    {
+        // Code here 
+        int n=matrix.length;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==-1){
+                    matrix[i][j]=(int)(1e9);
+                }
+                if(i==j){
+                matrix[i][j]=0;
+                }
+            }
+        }
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                for(int k=0;k<n;k++){
+                    matrix[j][k]=Math.min(matrix[j][k],matrix[j][i]+matrix[i][k]);
+                }
+            }
+        }
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==(int)(1e9)){
+                    matrix[i][j]=-1;
+                }
+            }
+        }
+    }
+}
+can be used in case of self loops
