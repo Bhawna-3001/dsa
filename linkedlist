@@ -1,0 +1,23 @@
+//l.descendingIterator
+        LinkedList<String> l=new LinkedList<String>();
+        l.add("a");
+        l.add("b");
+        Iterator x = l.descendingIterator();
+        while(x.hasNext()){
+            System.out.println(x.next());
+        }
+        //output: ba
+___________________________________________
+//finding miidle of linkedlist(tortiseHare method)
+//increase slow by 1 step and fast by 2 steps
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        ListNode slow=head;
+        ListNode fast=head;
+        while(fast!=null && fast.next!=null){
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        return slow;
+    }
+}
