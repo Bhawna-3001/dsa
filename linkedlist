@@ -21,3 +21,21 @@ class Solution {
         return slow;
     }
 }
+________________________________
+//reverse singly ll using recursion
+
+    public ListNode reverse(ListNode head, ListNode temp){
+        if(head!=null){
+            ListNode parent=head.next;
+            head.next=temp;
+            temp=head;
+            head=parent;
+            temp=reverse(head,temp);
+            //parent=head.next;
+        }
+        return temp;
+    }
+    public ListNode reverseList(ListNode head) {
+        ListNode temp=null;
+        return reverse(head,temp);
+___________________________________________________
