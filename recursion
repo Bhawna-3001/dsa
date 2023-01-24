@@ -1,0 +1,49 @@
+//printing one subsequence out of all possible subseq without using global variable
+boolean subseq(int n,int ind,list<Integer> arr,int num[],int sum){
+        if(ind==n){
+            if(sum==n ){
+                //print() subseq;
+                return true;
+            }
+        }
+        arr.add(nums[i]);
+        sum+=nums[i];
+        if(subseq(n,ind+1,arr,num)==true){
+            return true;
+        }
+        arr.remove();
+        sum-=nums[i];
+        if(subseq(n,ind+1,arr,num)==true){
+            return true;
+        }
+        return false;
+}
+Time compl:2^n
+_____________________________________
+//count no of subseq having sum k
+int subseq(int n,int ind,list<Integer> arr,int num[],int sum){
+        if(ind==n){
+            if(sum==n ){
+                return 1;
+            }
+        }
+        arr.add(nums[i]);
+        sum+=nums[i];
+        int l=subseq(n,ind+1,arr,num);
+        arr.remove();
+        sum-=nums[i];
+        int r=subseq(n,ind+1,arr,num);
+        return l+r;
+}
+____________________________________
+//Given an array of distinct integers candidates and a target integer target, 
+return a list of all unique combinations of candidates where the chosen numbers sum to target. 
+You may return the combinations in any order.
+The same number may be chosen from candidates an unlimited number of times. Two combinations are unique if the 
+frequency
+ of at least one of the chosen numbers is different.
+ 
+ time complexity: 2^t*k
+ 2^t because a no can be added into the queue t times and
+ k=it takes some time for an arraylist to add a subseq
+ 
