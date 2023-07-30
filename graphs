@@ -1,3 +1,21 @@
+//to convert adjacency matrix to list:
+public int findCircleNum(int[][] isConnected) {
+        //converting adj matrix to dj list
+        ArrayList<ArrayList<Integer>> adjlt= new ArrayList<ArrayList<Integer>>();
+        int n=isConnected.length;
+        for(int i=0;i<n;i++){
+            adjlt.add(new ArrayList<Integer>());
+        }
+        for(int i=0;i<n;i++){
+            for (int j=0;j<n;j++){
+                if(isConnected[i][j]==1 && i!=j){
+                    adjlt.get(i).add(j);
+                    // adjlt.get(j).add(i);
+                }
+            }
+        }
+}
+____________________________________________________
 //BFS 
 class Solution {
     // Function to return Breadth First Traversal of given graph.
@@ -23,8 +41,8 @@ class Solution {
         return bfs;
     }
 }
-TIME: O(N) + O(2E)
-space: O(3N)
+TIME: O(N) + O(2E)....O(n+e)
+space: O(3N)...vis array, queue, res arraylist
 _____________________________________________________
 
 //dfs gfg
@@ -41,7 +59,6 @@ class Solution {
     // Function to return a list containing the DFS traversal of the graph.
     //main code
     public ArrayList<Integer> dfsOfGraph(int V, ArrayList<ArrayList<Integer>> adj) {
-        // Code here
         boolean vis[]=new boolean[V+1];
         int size=V+1;
         vis[0]=true;
