@@ -233,6 +233,11 @@ Space Complexity: O ( n x n )
 Reason: worst-case –  If all oranges are Rotten, we will end up pushing all rotten oranges into the Queue data structure
 ______________________________________________________________________
 #flood fill
+# no of enclaves Number of Enclaves
+Problem Statement: You are given an N x M binary matrix grid, where 0 represents a sea cell and 1 represents a land cell. 
+A move consists of walking from one land cell to another adjacent (4-directionally) land cell or walking off the boundary of the grid. 
+Find the number of land cells in the grid for which we cannot walk off the boundary of the grid in any number of moves.
+-------------------------------------------------------------------
 class Solution {
     private void dfs(int row,int col,int[][] image, int[][] matrix, int delr[], int delc[], int color, int oc){
         matrix[row][col]=color;
@@ -262,6 +267,160 @@ For the worst case, all of the pixels will have the same colour, so DFS function
 Space Complexity: O(N x M) + O(N x M)
 
 O(N x M) for copied input array and recursive stack space takes up N x M locations at max. 
+________________________________________________________________________________
+# no of distinct islands. the islands can also be diagonally connected i.e in 8 directions in total
+class Solution {
+    private void bfs(int ro, int co, int[][] vis, char[][] grid) {
+      vis[ro][co] = 1; 
+      Queue<Pair> q = new LinkedList<Pair>();
+      q.add(new Pair(ro, co)); 
+      int n = grid.length; 
+      int m = grid[0].length; 
+      
+      // until the queue becomes empty
+      while(!q.isEmpty()) {
+          int row = q.peek().first; 
+          int col = q.peek().second; 
+          q.remove(); 
+          
+          // traverse in the neighbours and mark them if its a land 
+          for(int delrow = -1; delrow<=1;delrow++) {
+              for(int delcol = -1; delcol <= 1; delcol++) {
+                  int nrow = row + delrow; 
+                  int ncol = col + delcol; 
+          // check if neighbour row and column is valid, and is an unvisited land
+                  if(nrow >= 0 && nrow < n && ncol >= 0 && ncol < m 
+                  && grid[nrow][ncol] == '1' && vis[nrow][ncol] == 0) {
+                      vis[nrow][ncol] = 1; 
+                      q.add(new Pair(nrow, ncol)); 
+                  }
+              }
+          }
+      }
+  }
+
+    // Function to find the number of islands.
+    public int numIslands(char[][] grid) {
+        int n = grid.length; 
+        int m = grid[0].length; 
+        int[][] vis = new int[n][m];
+        int cnt = 0; 
+        for(int row = 0; row < n ; row++) {
+            for(int col = 0; col < m ;col++) {
+                // if not visited and is a land
+                if(vis[row][col] == 0 && grid[row][col] == '1') {
+                    cnt++; 
+                    bfs(row, col, vis, grid); 
+                }
+            }
+        }
+        return cnt; 
+    }
+Time Complexity ~ O(N² + NxMx9)= [N²] for the nested loops, and NxMx9 for the overall DFS of the matrix, that will happen throughout if all the cells are filled with 1.
+Space Complexity: O(N²) for visited array max queue space O(N²), If all are marked as 1 then the maximum queue space will be N².
+______________________________________________________________________
+# bipartite
+
+class Solution
+{
+    private boolean dfs(int node, int col, int color[], 
+    ArrayList<ArrayList<Integer>>adj) {
+        
+        color[node] = col; 
+        
+        // traverse adjacent nodes
+        for(int it : adj.get(node)) {
+            // if uncoloured
+            if(color[it] == -1) {
+                if(dfs(it, 1 - col, color, adj) == false) return false; 
+            }
+            // if previously coloured and have the same colour
+            else if(color[it] == col) {
+                return false; 
+            }
+        }
+        
+        return true; 
+    }
+    public boolean isBipartite(int V, ArrayList<ArrayList<Integer>>adj)
+    {
+        int color[] = new int[V];
+	    for(int i = 0;i<V;i++) color[i] = -1; 
+	    
+	    // for connected components
+	    for(int i = 0;i<V;i++) {
+	        if(color[i] == -1) {
+	            if(dfs(i, 0, color, adj) == false) return false; 
+	        }
+	    }
+	    return true; 
+    }
+     public static void main(String[] args)
+    {
+        // V = 4, E = 4
+        ArrayList < ArrayList < Integer >> adj = new ArrayList < > ();
+        for (int i = 0; i < 4; i++) {
+            adj.add(new ArrayList < > ());
+        }
+        adj.get(0).add(2);
+        adj.get(2).add(0);
+        adj.get(0).add(3);
+        adj.get(3).add(0);
+        adj.get(1).add(3);
+        adj.get(3).add(1);
+        adj.get(2).add(3);
+        adj.get(3).add(2);
+
+        Solution obj = new Solution();
+        boolean ans = obj.isBipartite(4, adj);
+        if(ans)
+            System.out.println("1");
+        else System.out.println("0");
+    }
+
+}
+time: O(v+2e)
+space: O(3v)
+________________________________________________________________
+# detect cycle in directed graph
+class Solution {
+    private boolean dfsCheck(int node, ArrayList<ArrayList<Integer>> adj, int vis[], int pathVis[]) {
+        vis[node] = 1; 
+        pathVis[node] = 1; 
+        
+        // traverse for adjacent nodes 
+        for(int it : adj.get(node)) {
+            // when the node is not visited 
+            if(vis[it] == 0) {
+                if(dfsCheck(it, adj, vis, pathVis) == true) 
+                    return true; 
+            }
+            // if the node has been previously visited
+            // but it has to be visited on the same path 
+            else if(pathVis[it] == 1) {
+                return true; 
+            }
+        }
+        
+        pathVis[node] = 0; 
+        return false; 
+    }
+
+    // Function to detect cycle in a directed graph.
+    public boolean isCyclic(int V, ArrayList<ArrayList<Integer>> adj) {
+        int vis[] = new int[V];
+        int pathVis[] = new int[V];
+        
+        for(int i = 0;i<V;i++) {
+            if(vis[i] == 0) {
+                if(dfsCheck(i, adj, vis, pathVis) == true) return true; 
+            }
+        }
+        return false; 
+    }
+}
+time: O(v+2e)
+space: O(N)
 __________________________________________________________
 //dfs complete code
 import java.util.*;
@@ -712,6 +871,8 @@ class Solution {
         return true;
     }
 }
+time: O(e+v)
+space: O(N)
 ___________________________________________
 //dijkastra using priority queue
 class pair{
