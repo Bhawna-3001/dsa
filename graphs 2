@@ -52,3 +52,146 @@ If we find any node unvisited, we will perform a push operation and for that, we
 Space Complexity: O(E) + O(V), where E = no. of edges and V = no. of vertices. O(E) occurs due to the size of the priority queue and O(V) due to the visited array. 
 If we wish to get the mst, we need an extra O(V-1) space to store the edges of the most.
 ____________________________________________________________
+disjoint on graphs
+import java.io.*;
+import java.util.*;
+class DisjointSet {
+    List<Integer> rank = new ArrayList<>();
+    List<Integer> parent = new ArrayList<>();
+    List<Integer> size = new ArrayList<>();
+    public DisjointSet(int n) {
+        for (int i = 0; i <= n; i++) {
+            rank.add(0);
+            parent.add(i);
+            size.add(1);
+        }
+    }
+
+    public int findUPar(int node) {
+        if (node == parent.get(node)) {
+            return node;
+        }
+        int ulp = findUPar(parent.get(node));
+        parent.set(node, ulp);
+        return parent.get(node);
+    }
+
+    public void unionByRank(int u, int v) {
+        int ulp_u = findUPar(u);
+        int ulp_v = findUPar(v);
+        if (ulp_u == ulp_v) return;
+        if (rank.get(ulp_u) < rank.get(ulp_v)) {
+            parent.set(ulp_u, ulp_v);
+        } else if (rank.get(ulp_v) < rank.get(ulp_u)) {
+            parent.set(ulp_v, ulp_u);
+        } else {
+            parent.set(ulp_v, ulp_u);
+            int rankU = rank.get(ulp_u);
+            rank.set(ulp_u, rankU + 1);
+        }
+    }
+
+    public void unionBySize(int u, int v) {
+        int ulp_u = findUPar(u);
+        int ulp_v = findUPar(v);
+        if (ulp_u == ulp_v) return;
+        if (size.get(ulp_u) < size.get(ulp_v)) {
+            parent.set(ulp_u, ulp_v);
+            size.set(ulp_v, size.get(ulp_v) + size.get(ulp_u));
+        } else {
+            parent.set(ulp_v, ulp_u);
+            size.set(ulp_u, size.get(ulp_u) + size.get(ulp_v));
+        }
+    }
+}
+
+class Main {
+    public static void main (String[] args) {
+        DisjointSet ds = new DisjointSet(7);
+        ds.unionByRank(1, 2);
+        ds.unionByRank(2, 3);
+        ds.unionByRank(4, 5);
+        ds.unionByRank(6, 7);
+        ds.unionByRank(5, 6);
+
+        // if 3 and 7 same or not
+        if (ds.findUPar(3) == ds.findUPar(7)) {
+            System.out.println("Same");
+        } else
+            System.out.println("Not Same");
+
+        ds.unionByRank(3, 7);
+        if (ds.findUPar(3) == ds.findUPar(7)) {
+            System.out.println("Same");
+        } else
+            System.out.println("Not Same");
+    }
+}
+time: O(4alpha)=O(1)
+_________________________________________________________-
+#  min no of operations to make network conected
+class dset{
+    List<Integer> parent=new ArrayList<>();
+    List<Integer> size=new ArrayList<>();
+    dset(int n){
+        for(int i=0;i<=n;i++){
+            parent.add(i);
+            size.add(1);
+        }
+    }
+    public int findp(int node){
+        if(node==parent.get(node)){
+            return node;
+        }
+        int par=findp(parent.get(node));
+        parent.set(node,par);
+        return parent.get(node);
+    }
+    public void unionBySize(int u,int v){
+        int pu=findp(u);
+        int pv=findp(v);
+        if(pu==pv){return;}
+        else if(size.get(pu)<size.get(pv)){
+            parent.set(pu,pv);
+            size.set(pv,size.get(pu)+size.get(pv));
+        }else{
+            parent.set(pv,pu);
+            size.set(pu,size.get(pu)+size.get(pv));
+        }
+    }
+}
+class Solution {
+    
+    public int makeConnected(int n, int[][] connections) {
+        dset arr=new dset(n);
+        int len=connections.length;
+        int extra=0;
+        for(int i=0;i<len;i++){
+            int u=connections[i][0];
+            int v=connections[i][1];
+            if(arr.findp(u)==arr.findp(v)){
+                extra++;
+            }else{
+                arr.unionBySize(u,v);
+            }
+        }
+        int comp=0;
+        for(int i=0;i<n;i++){
+            if(arr.parent.get(i)==i){
+                comp++;
+            }
+        }
+        int ans=comp-1;
+        if(extra>=ans){
+            return ans;
+        }
+        return -1;
+    }
+}
+time:  o(e+v)
+The first term is to calculate the number of extra edges and the second term is to count the number of components. 
+4α is for the disjoint set operation we have used and this term is so small that it can be considered constant.
+
+Space Complexity: O(2N) where N = no. of nodes. 2N for the two arrays(parent and size) of size N we have 
+used inside the disjoint set.
+__________________________________________________-
