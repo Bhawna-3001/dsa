@@ -1,0 +1,79 @@
+# preorder recursive
+static void preOrderTrav(Node curr, ArrayList < Integer > preOrder) {
+        if (curr == null)
+            return;
+
+        preOrder.add(curr.data);
+        preOrderTrav(curr.left, preOrder);
+        preOrderTrav(curr.right, preOrder);
+    }
+time :O(N)
+space:O(N)
+_________________________________________________________________________
+# preorder iterative solution
+public class TUF {
+    static ArrayList < Integer > preOrderTrav(Node curr) {
+        ArrayList < Integer > preOrder = new ArrayList < Integer > ();
+        if (curr == null)
+            return preOrder;
+
+        Stack < Node > s = new Stack < > ();
+        s.push(curr);
+
+        while (!s.isEmpty()) {
+            Node topNode = s.peek();
+            preOrder.add(topNode.data);
+            s.pop();
+            if (topNode.right != null)
+                s.push(topNode.right);
+            if (topNode.left != null)
+                s.push(topNode.left);
+        }
+        return preOrder;
+
+    }
+time: O(N)
+space: O(N)
+_____________________________________________________
+
+#check balanced height
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        return dfsHeight (root) != -1;
+    }
+    int dfsHeight (TreeNode root) {
+        if (root == null) return 0;
+        
+        int leftHeight = dfsHeight (root.left);
+        if (leftHeight == -1) return -1;
+        int rightHeight = dfsHeight (root.right);
+        if (rightHeight == -1) return -1;
+        
+        if (Math.abs(leftHeight - rightHeight) > 1)  return -1;
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+}
+timr: O(N)
+space:O(1)
+_________________________________________________________
+# diameter
+public class Solution {
+    public int diameterOfBinaryTree(TreeNode root) {
+        int[] diameter = new int[1];
+        height(root, diameter);
+        return diameter[0];        
+    }
+
+    private int height(TreeNode node, int[] diameter) {
+        if (node == null) {
+            return 0;
+        }
+        int lh = height(node.left, diameter);
+        int rh = height(node.right, diameter);
+        diameter[0] = Math.max(diameter[0], lh + rh);
+        return 1 + Math.max(lh, rh);
+    }
+}
+time: O(N)
+space:O(1)+O(H)stack space
+__________________________________________________
