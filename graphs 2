@@ -195,3 +195,47 @@ The first term is to calculate the number of extra edges and the second term is 
 Space Complexity: O(2N) where N = no. of nodes. 2N for the two arrays(parent and size) of size N we have 
 used inside the disjoint set.
 __________________________________________________-
+# bridge in the graph
+class Solution {
+    private int timer=1;
+    public void dfs(int node,int parent,List<List<Integer>> adj, List<List<Integer>> bridge,int vis[],int tin[],int low[]){
+        vis[node]=1;
+        tin[node]=low[node]=timer;
+        timer++;
+        for(Integer it: adj.get(node)){
+            if(it==parent){
+                continue;
+            }
+            if(vis[it]==0){
+                dfs(it,node,adj,bridge,vis,tin,low);
+                low[node]=Math.min(low[it],low[node]);
+                if(low[it]>tin[node]){
+                    bridge.add(Arrays.asList(it, node));
+                }
+            }else{
+                low[node]=Math.min(low[node],low[it]);
+            }
+        }
+    }
+    public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {
+        List<List<Integer>> adj=new ArrayList<>();
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(List<Integer> it: connections){
+            int u=it.get(0);
+            int v=it.get(1);
+            adj.get(u).add(v);
+            adj.get(v).add(u);
+        }
+        int vis[]=new int[n];
+        int low[]=new int[n];
+        int tin[]=new int[n];
+        List<List<Integer>> bridge=new ArrayList<>();
+        dfs(0,-1,adj,bridge,vis,tin,low);
+        return bridge;
+    }
+}
+time:O(v+3e)
+space: O(v+2e+3v)
+__________________________________________________________________
