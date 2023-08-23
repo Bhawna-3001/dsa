@@ -24,6 +24,153 @@ class Solution {
     }
 }
 ________________________________________
+#frog jump
+Given a number of stairs and a frog, the frog wants to climb from the 0th stair to the (N-1)th stair. 
+At a time the frog can climb either one or two steps. A height[N] array is also given. 
+Whenever the frog jumps from a stair i to stair j, the energy consumed in the jump is abs(height[i]- height[j]), 
+where abs() means the absolute difference. 
+We need to return the minimum energy that can be used by the frog to jump from stair 0 to stair N-1.
+
+import java.util.*;
+class TUF{
+public static void main(String args[]) {
+
+  int height[]={30,10,60,10,60,50};
+  int n=height.length;
+   int prev=0;
+  int prev2=0;
+  for(int i=1;i<n;i++){
+      
+      int jumpTwo = Integer.MAX_VALUE;
+      int jumpOne= prev + Math.abs(height[i]-height[i-1]);
+      if(i>1)
+        jumpTwo = prev2 + Math.abs(height[i]-height[i-2]);
+    
+      int cur_i=Math.min(jumpOne, jumpTwo);
+      prev2=prev;
+      prev=cur_i;
+        
+  }
+  System.out.println(prev);
+}
+}
+___________________________________________
+#frog jump k
+This is a follow-up question to “Frog Jump” discussed in the previous article. 
+In the previous question, the frog was allowed to jump either one or two steps at a time. In this question, 
+the frog is allowed to jump up to ‘K’ steps at a time. If K=4, the frog can jump 1,2,3, or 4 steps at every index.
+
+import java.util.*;
+class TUF{
+static int solveUtil(int n, int[] height, int[] dp, int k){
+    dp[0]=0;
+    for(int i=1;i<n;i++){
+        int mmSteps = Integer.MAX_VALUE;
+        
+        for(int j=1;j<=k;j++){
+            if(i-j>=0){
+                int jump = dp[i-j]+ Math.abs(height[i]- height[i-j]);
+                mmSteps= Math.min(jump, mmSteps);
+            }
+        }
+        dp[i]= mmSteps;
+    }
+    return dp[n-1];
+    
+}
+
+static int solve(int n, int[] height , int k){
+    int dp[]=new int[n];
+    Arrays.fill(dp,-1);
+    return solveUtil(n, height, dp, k);
+}
+
+public static void main(String args[]) {
+
+  int height[]={30,10,60 , 10 , 60 , 50};
+  int n=height.length;
+  int k=2;
+  System.out.println(solve(n,height,k));
+}
+}
+_____________________________________________________________________
+#max sum of non adjacent elements
+
+Given an array of ‘N’  positive integers, we need to return the maximum 
+sum of the subsequence such that no two elements of the subsequence are adjacent elements in the array.
+static int solve(int n, int[] arr){
+    
+   int prev = arr[0];
+    int prev2 =0;
+    
+    for(int i=1; i<n; i++){
+        int pick = arr[i];
+        if(i>1)
+            pick += prev2;
+        int nonPick = 0 + prev;
+        
+        int cur_i = Math.max(pick, nonPick);
+        prev2 = prev;
+        prev= cur_i;
+        
+    }
+    return prev;
+}
+public static void main(String args[]) {
+
+  int arr[]={2,1,4,9};
+  int n=arr.length;
+  System.out.println(solve(n,arr));
+}
+}
+_________________________________________________________
+# theif robbing
+
+A thief needs to rob money in a street. The houses in the street are arranged in a circular manner. 
+Therefore the first and the last house are adjacent to each other. The security system in the street 
+is such that if adjacent houses are robbed, the police will get notified.
+Given an array of integers “Arr” which represents money at each house, we need to return the maximum amount 
+of money that the thief can rob without alerting the police.
+
+static long solve(ArrayList<Integer> arr){
+    int n = arr.size();
+    long prev = arr.get(0);
+    long prev2 =0;
+    
+    for(int i=1; i<n; i++){
+        long pick = arr.get(i);
+        if(i>1)
+            pick += prev2;
+        long nonPick = 0 + prev;
+        
+        long cur_i = Math.max(pick, nonPick);
+        prev2 = prev;
+        prev= cur_i;
+        
+    }
+    return prev;
+}
+
+static long robStreet(int n, ArrayList<Integer> arr){
+    ArrayList<Integer> arr1=new ArrayList<>();
+    ArrayList<Integer> arr2=new ArrayList<>();
+
+    if(n==1)
+       return arr.get(0);
+    
+    for(int i=0; i<n; i++){
+        
+        if(i!=0) arr1.add(arr.get(i));
+        if(i!=n-1) arr2.add(arr.get(i));
+    }
+    
+    long ans1 = solve(arr1);
+    long ans2 = solve(arr2);
+    
+    return Math.max(ans1,ans2);
+}
+
+_______________________________________________________________
 //ninja training
 
 import java.util.*;
@@ -108,3 +255,80 @@ public static void main(String args[]) {
   System.out.println(countWays(m,n));
 }
 }
+_______________________________________________
+#min path sum in triangular matrix
+static int minimumPathSum(int[][] triangle, int n){
+    int dp[][]= new int[n][n];
+    
+    for(int j=0;j<n;j++){
+        dp[n-1][j] = triangle[n-1][j];
+    }
+    
+    for(int i=n-2; i>=0; i--){
+        for(int j=i; j>=0; j--){
+            
+            int down = triangle[i][j]+dp[i+1][j];
+            int diagonal = triangle[i][j]+dp[i+1][j+1];
+            
+            dp[i][j] = Math.min(down, diagonal);
+        }
+    }
+    
+    return dp[0][0];
+    
+}
+
+public static void main(String args[]) {
+
+  int triangle [][] = {{1},
+                       {2,3},
+                       {3,6,7},
+                       {8,9,6,10}};
+                            
+  int n = triangle.length;
+  
+  System.out.println(minimumPathSum(triangle,n));
+}
+}
+___________________________________________________
+#max falling path sum
+
+static int getMaxPathSum(int[][] matrix){
+    
+    int n = matrix.length;
+    int m = matrix[0].length;
+    
+    int dp[][] = new int[n][m];
+    
+    // Initializing first row - base condition
+    for(int j=0; j<m; j++){
+        dp[0][j] = matrix[0][j];
+    }
+    
+    for(int i=1; i<n; i++){
+        for(int j=0;j<m;j++){
+            
+            int up = matrix[i][j] + dp[i-1][j];
+            
+            int leftDiagonal= matrix[i][j];
+            if(j-1>=0) leftDiagonal += dp[i-1][j-1];
+            else leftDiagonal += (int)Math.pow(-10,9);
+            
+            int rightDiagonal = matrix[i][j];
+            if(j+1<m) rightDiagonal += dp[i-1][j+1];
+            else rightDiagonal += (int)Math.pow(-10,9);
+            
+            dp[i][j] = Math.max(up, Math.max(leftDiagonal,rightDiagonal));
+            
+        }
+    }
+    
+    int maxi = Integer.MIN_VALUE;
+    
+    for(int j=0; j<m;j++){
+        maxi = Math.max(maxi,dp[n-1][j]);
+    }
+    
+    return maxi;
+}
+____________________________________________________________
