@@ -232,41 +232,281 @@ Space Complexity: O ( n x n )
 
 Reason: worst-case –  If all oranges are Rotten, we will end up pushing all rotten oranges into the Queue data structure
 ______________________________________________________________________
-#flood fill
-# no of enclaves Number of Enclaves
-Problem Statement: You are given an N x M binary matrix grid, where 0 represents a sea cell and 1 represents a land cell. 
-A move consists of walking from one land cell to another adjacent (4-directionally) land cell or walking off the boundary of the grid. 
-Find the number of land cells in the grid for which we cannot walk off the boundary of the grid in any number of moves.
--------------------------------------------------------------------
+#flood fill dfs
+________________________________________________________________________
+#cycle detection in undirected graph bfs
+class Solution
+{
+   static boolean checkForCycle(ArrayList<ArrayList<Integer>> adj, int s,
+            boolean vis[], int parent[])
+    {
+       Queue<Node> q =  new LinkedList<>(); //BFS
+       q.add(new Node(s, -1));
+       vis[s] =true;
+       
+       // until the queue is empty
+       while(!q.isEmpty())
+       {
+           // source node and its parent node
+           int node = q.peek().first;
+           int par = q.peek().second;
+           q.remove(); 
+           
+           // go to all the adjacent nodes
+           for(Integer it: adj.get(node))
+           {
+               if(vis[it]==false)  
+               {
+                   q.add(new Node(it, node));
+                   vis[it] = true; 
+               }
+        
+                // if adjacent node is visited and is not its own parent node
+               else if(par != it) return true;
+           }
+       }
+       
+       return false;
+    }
+    
+    // function to detect cycle in an undirected graph
+    public boolean isCycle(int V, ArrayList<ArrayList<Integer>> adj)
+    {
+        boolean vis[] = new boolean[V];
+        Arrays.fill(vis,false);
+        int parent[] = new int[V];
+        Arrays.fill(parent,-1);  
+        
+        for(int i=0;i<V;i++)
+            if(vis[i]==false) 
+                if(checkForCycle(adj, i,vis, parent)) 
+                    return true;
+    
+        return false;
+    }
+time: O(n+2e)+O(N) for connected components
+space: O(2n) queue+vis
+________________________________________________________________________
+#detect cycle in gralh dfs
 class Solution {
-    private void dfs(int row,int col,int[][] image, int[][] matrix, int delr[], int delc[], int color, int oc){
-        matrix[row][col]=color;
-        int r=image.length;
-        int c= image[0].length;
-        for(int i=0;i<4;i++){
-            int nrow=row+delr[i];
-            int ncol=col+delc[i];
-            if(nrow>=0 && ncol>=0 && nrow<r && ncol<c && image[nrow][ncol]==oc && matrix[nrow][ncol]!=color){
-                dfs(nrow,ncol,image,matrix,delr,delc,color,oc);
+    private boolean dfs(int node, int parent, int vis[], ArrayList<ArrayList<Integer>> adj) {
+        vis[node] = 1; 
+        // go to all adjacent nodes
+        for(int adjacentNode: adj.get(node)) {
+            if(vis[adjacentNode]==0) {
+                if(dfs(adjacentNode, node, vis, adj) == true) 
+                    return true; 
+            }
+            // if adjacent node is visited and is not its own parent node
+            else if(adjacentNode != parent) return true; 
+        }
+        return false; 
+    }
+    // Function to detect cycle in an undirected graph.
+    public boolean isCycle(int V, ArrayList<ArrayList<Integer>> adj) {
+       int vis[] = new int[V]; 
+       for(int i = 0;i<V;i++) {
+           if(vis[i] == 0) {
+               if(dfs(i, -1, vis, adj) == true) return true; 
+           }
+       }
+       return false; 
+    }
+_________________________________________________________________________
+# 0/1 matrix bfs
+public int[][] nearest(int[][] grid)
+    {
+        int n = grid.length; 
+	    int m = grid[0].length; 
+	    // visited and distance matrix
+	    int vis[][] = new int[n][m]; 
+	    int dist[][] = new int[n][m]; 
+	    // <coordinates, steps>
+	    Queue<Node> q = new LinkedList<Node>();
+	    // traverse the matrix
+	    for(int i = 0;i<n;i++) {
+	        for(int j = 0;j<m;j++) {
+	        // start BFS if cell contains 1
+	            if(grid[i][j] == 1) {
+	                q.add(new Node(i, j, 0)); 
+	                vis[i][j] = 1; 
+	            }
+	            else {
+	                // mark unvisted 
+	                vis[i][j] = 0; 
+	            }
+	        }
+	    }
+	    
+	    
+	    
+	    int delrow[] = {-1, 0, +1, 0}; 
+	    int delcol[] = {0, +1, 0, -1}; 
+	    
+	    
+	    // n x m x 4 
+	    // traverse till queue becomes empty
+	    while(!q.isEmpty()) {
+	        int row = q.peek().first; 
+	        int col = q.peek().second; 
+	        int steps = q.peek().third; 
+	        q.remove(); 
+	        dist[row][col] = steps; 
+	        // for all 4 neighbours
+	        for(int i = 0;i<4;i++) {
+	            int nrow = row + delrow[i]; 
+	            int ncol = col + delcol[i]; 
+	            // check for valid unvisited cell
+	            if(nrow >= 0 && nrow < n && ncol >= 0 && ncol < m
+	            && vis[nrow][ncol] == 0)  {
+	                    vis[nrow][ncol] = 1; 
+    	            q.add(new Node(nrow, ncol, steps+1));  
+	            } 
+	            }
+	        }
+	    
+	    // return distance matrix
+	    return dist; 
+    }
+time: O(N*M+4*N*M)=O(N*M)
+space: O(N*M)...vis,dis,queue
+___________________________________________________________________________
+# surrounded regions
+Problem Statement: Given a matrix mat of size N x M where every element is either ‘O’ or ‘X’. 
+Replace all ‘O’ with ‘X’ that is surrounded by ‘X’. An ‘O’ (or a set of ‘O’) is considered to be surrounded by ‘X’ 
+if there are ‘X’ at locations just below, just above just left, and just right of it.
+
+class Solution{
+    static void dfs(int row, int col,int vis[][], 
+    char mat[][], int delrow[], int delcol[]) {
+        vis[row][col] = 1; 
+        int n = mat.length;
+        int m = mat[0].length;
+        
+        // check for top, right, bottom, left 
+        for(int i = 0;i<4;i++) {
+            int nrow = row + delrow[i];
+            int ncol = col + delcol[i]; 
+            // check for valid coordinates and unvisited Os
+            if(nrow >=0 && nrow <n && ncol >= 0 && ncol < m 
+            && vis[nrow][ncol] == 0 && mat[nrow][ncol] == 'O') {
+                dfs(nrow, ncol, vis, mat, delrow, delcol); 
             }
         }
     }
-    public int[][] floodFill(int[][] image, int sr, int sc, int color) {
-        int matrix[][]=image;
-        int delr[]={-1,0,1,0};
-        int delc[]={0,1,0,-1};
-        int oc=image[sr][sc];
-        dfs(sr,sc,image,matrix,delr,delc,color,oc);
-        return matrix;
+
+    static char[][] fill(int n, int m, char mat[][])
+    {
+        int delrow[] = {-1, 0, +1, 0};
+        int delcol[] = {0, 1, 0, -1}; 
+        int vis[][] = new int[n][m]; 
+        // traverse first row and last row 
+        for(int j = 0 ; j<m;j++) {
+            // check for unvisited Os in the boundary rws
+            // first row 
+            if(vis[0][j] == 0 && mat[0][j] == 'O') {
+                dfs(0, j, vis, mat, delrow, delcol); 
+            }
+            
+            // last row 
+            if(vis[n-1][j] == 0 && mat[n-1][j] == 'O') {
+                dfs(n-1,j,vis,mat, delrow, delcol); 
+            }
+        }
+        
+        for(int i = 0;i<n;i++) {
+            // check for unvisited Os in the boundary columns
+            // first column 
+            if(vis[i][0] == 0 && mat[i][0] == 'O') {
+                dfs(i, 0, vis, mat, delrow, delcol); 
+            }
+            
+            // last column
+            if(vis[i][m-1] == 0 && mat[i][m-1] == 'O') {
+                dfs(i, m-1, vis, mat, delrow, delcol); 
+            }
+        }
+        
+        // if unvisited O then convert to X
+        for(int i = 0;i<n;i++) {
+            for(int j= 0 ;j<m;j++) {
+                if(vis[i][j] == 0 && mat[i][j] == 'O') 
+                    mat[i][j] = 'X'; 
+            }
+        }
+        
+        return mat;
     }
-}
-Time Complexity: O(NxM + NxMx4) ~ O(N x M)
+Time Complexity: O(N) + O(M) + O(NxMx4) ~ O(N x M), 
+For the worst case, every element will be marked as ‘O’ in the matrix, and the DFS function will be called 
+for (N x M) nodes and for every node, we are traversing for 4 neighbors, so it will take O(N x M x 4) time. 
+Also, we are running loops for boundary elements so it will take O(N) + O(M).
 
-For the worst case, all of the pixels will have the same colour, so DFS function will be called for (N x M) nodes and for every node we are traversing for 4 neighbours, so it will take O(N x M x 4) time.
+Space Complexity ~ O(N x M), O(N x M) for the visited array, and auxiliary stack space takes up N x M locations at max. 
+__________________________________________________________________________________
+# no of enclaves Number of Enclaves bfs
+Problem Statement: You are given an N x M binary matrix grid, where 0 represents a sea cell and 1 represents a land cell. 
+A move consists of walking from one land cell to another adjacent (4-directionally) land cell or walking off the boundary of the grid. 
+Find the number of land cells in the grid for which we cannot walk off the boundary of the grid in any number of moves.
 
+class Solution {
+
+    int numberOfEnclaves(int[][] grid) {
+        Queue<Pair> q = new LinkedList<Pair>();
+        int n = grid.length; 
+        int m = grid[0].length; 
+        int vis[][] = new int[n][m];
+        // traverse boundary elements
+        for(int i = 0;i<n;i++) {
+            for(int j = 0;j<m;j++) {
+                // first row, first col, last row, last col 
+                if(i == 0 || j == 0 || i == n-1 || j == m-1) {
+                    // if it is a land then store it in queue
+                    if(grid[i][j] == 1) {
+                        q.add(new Pair(i, j)); 
+                        vis[i][j] = 1; 
+                    }
+                }
+            }
+        }
+        
+        int delrow[] = {-1, 0, +1, 0};
+        int delcol[] = {0, +1, +0, -1}; 
+        
+        while(!q.isEmpty()) {
+            int row = q.peek().first; 
+            int col = q.peek().second; 
+            q.remove(); 
+            
+            // traverses all 4 directions
+            for(int i = 0;i<4;i++) {
+                int nrow = row + delrow[i];
+                int ncol = col + delcol[i]; 
+                // check for valid coordinates and for land cell
+                if(nrow >=0 && nrow <n && ncol >=0 && ncol < m 
+                && vis[nrow][ncol] == 0 && grid[nrow][ncol] == 1) {
+                    q.add(new Pair(nrow, ncol));
+                    vis[nrow][ncol] = 1; 
+                }
+            }
+            
+        }
+        int cnt = 0;
+        for(int i = 0;i<n;i++) {
+            for(int j = 0;j<m;j++) {
+                // check for unvisited land cell
+                if(grid[i][j] == 1 & vis[i][j] == 0) 
+                    cnt++; 
+            }
+        }
+        return cnt; 
+        
+    }
+
+Time Complexity: O(NxMx4) ~ O(N x M) For the worst case, assuming all the pieces as land, 
+the BFS function will be called for (N x M) nodes and for every node, we are traversing for 4 neighbors, 
+so it will take O(N x M x 4) time. 
 Space Complexity: O(N x M) + O(N x M)
-
-O(N x M) for copied input array and recursive stack space takes up N x M locations at max. 
 ________________________________________________________________________________
 # no of distinct islands. the islands can also be diagonally connected i.e in 8 directions in total
 class Solution {
